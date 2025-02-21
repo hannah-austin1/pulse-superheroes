@@ -19,17 +19,24 @@ export default function DownloadButton({ user, type }: DownloadButtonProps) {
 
     try {
       if (type === "pdf") {
-        // PDF Download
-        const doc = <UserCardPDF user={user} />;
-        const blob = await pdf(doc).toBlob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${user.name}_Superhero_Card.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        let url = "";
+        try {
+          const blob = await pdf(<UserCardPDF user={user} />).toBlob();
+          url = URL.createObjectURL(blob);
+
+          const response = await fetch(url);
+          const blobData = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blobData);
+
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = `${user.name}_Superhero_Card.pdf`;
+          link.click();
+        } catch (error) {
+          console.error("Error in download process:", error);
+        } finally {
+          if (url) URL.revokeObjectURL(url);
+        }
       } else if (type === "icon") {
         // Icon Download
         const imgSrc =

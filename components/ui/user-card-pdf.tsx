@@ -14,6 +14,9 @@ import {
 import { User } from "@/types";
 
 import emojiRegex from "emoji-regex";
+import Bangers from "@/public/fonts/Bangers-Regular.ttf";
+import Poppins from "@/public/fonts/Poppins-Regular.ttf";
+import PoppinsBold from "@/public/fonts/Poppins-Bold.ttf";
 
 // ✅ Function to Convert Emojis to Image URLs (Cloudflare CDN)
 const replaceEmojisWithImages = (text: string) => {
@@ -59,17 +62,17 @@ const replaceEmojisWithImages = (text: string) => {
 // 📥 Register Fonts
 Font.register({
   family: "Bangers",
-  src: "https://raw.githubusercontent.com/google/fonts/main/ofl/bangers/Bangers-Regular.ttf",
+  src: Bangers,
 });
 
 Font.register({
   family: "Poppins",
   fonts: [
     {
-      src: "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf",
+      src: Poppins,
     },
     {
-      src: "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf",
+      src: PoppinsBold,
       fontWeight: "bold",
     },
   ],
