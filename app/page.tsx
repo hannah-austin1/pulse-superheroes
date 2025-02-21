@@ -8,7 +8,7 @@ async function fetchUsers(): Promise<User[]> {
   const { data, error } = await supabase
     .from("users")
     .select(
-      "id, name, team, tickets_completed, comments(id, content, created_at, name)"
+      "id, name, team, tickets_completed, time_on_project, favourite_moment, comments(id, content, created_at, name)"
     )
     .order("created_at", { foreignTable: "comments", ascending: false });
 

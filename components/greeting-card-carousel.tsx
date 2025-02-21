@@ -67,7 +67,7 @@ export default function GreetingCardCarousel({
                               <strong className="text-heroYellow">
                                 Time on Project:
                               </strong>{" "}
-                              {user.joinDate || "N/A"}
+                              {user.time_on_project || "N/A"}
                             </p>
                             <p>
                               <strong className="text-heroYellow">

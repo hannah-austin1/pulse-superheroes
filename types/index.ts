@@ -3,7 +3,7 @@ export interface User {
   name: string;
   created_at: string;
   team: string;
-  joinDate: string;
+  time_on_project: string;
   favourite_moment: string;
   tickets_completed: number;
   comments?: Comment[];
