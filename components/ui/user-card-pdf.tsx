@@ -85,15 +85,18 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontFamily: "Poppins",
   },
+  top: {
+    borderRadius: 8,
+    borderWidth: 4,
+    borderColor: "#FFD700",
+    zIndex: 1,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderBottomWidth: 4,
     backgroundColor: "#E63946",
-    borderBottomColor: "#FFD700",
     paddingBottom: 10,
-    marginBottom: 16,
     paddingTop: 16,
   },
   logo: {
@@ -107,18 +110,14 @@ const styles = StyleSheet.create({
     color: "#FFD700", // Gold text
   },
   body: {
-    padding: 24,
+    paddingTop: 10,
   },
   heroSection: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
-    padding: 12,
+    padding: 8,
     backgroundColor: "#222222",
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: "#FFD700",
   },
   image: {
     width: 150, // Square Image
@@ -143,11 +142,10 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   commentsContainer: {
-    marginTop: 12,
     padding: 10,
     backgroundColor: "#1D1D1D",
     borderRadius: 8,
-    borderWidth: 2,
+    borderWidth: 4,
     borderColor: "#E63946", // Red border like hero glow
   },
   name: {
@@ -170,16 +168,16 @@ const UserCardPDF: React.FC<{ user: User }> = ({ user }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header with Logo & Title */}
-        <View style={styles.header}>
-          <Image
-            src="https://bfcujebvtxcnkjyhrgjf.supabase.co/storage/v1/object/public/cartoons//menu-logo.png"
-            style={styles.logo}
-          />
-          <Text style={styles.title}>Superheroes</Text>
-        </View>
+        <View style={styles.top}>
+          {/* Header with Logo & Title */}
+          <View style={styles.header}>
+            <Image
+              src="https://bfcujebvtxcnkjyhrgjf.supabase.co/storage/v1/object/public/cartoons//menu-logo.png"
+              style={styles.logo}
+            />
+            <Text style={styles.title}>Superheroes</Text>
+          </View>
 
-        <View style={styles.body}>
           {/* Hero Section: Image & Stats Side by Side */}
           <View style={styles.heroSection}>
             {/* Square Profile Image */}
@@ -209,8 +207,10 @@ const UserCardPDF: React.FC<{ user: User }> = ({ user }) => {
               </Text>
             </View>
           </View>
+        </View>
 
-          {/* Comments Section */}
+        {/* Comments Section */}
+        <View style={styles.body}>
           <View style={styles.commentsContainer}>
             <Text style={styles.label}>Comments:</Text>
             {user.comments && user.comments.length > 0 ? (
