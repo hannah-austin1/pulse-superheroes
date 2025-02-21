@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import { User } from "@/types";
 import CommentForm from "@/components/ui/comment-form";
+import DownloadButton from "@/components/ui/download-button";
 
 interface GreetingCardCarouselProps {
   users: User[];
@@ -35,30 +36,40 @@ export default function GreetingCardCarousel({
                   className="w-full flex justify-center items-center"
                 >
                   {/* Superhero Card (Scrollable) */}
-                  <div className="relative transition-all duration-300 transform hover:scale-95 hover:border-4 hover:border-heroYellow hover:shadow-heroGlow rounded-xl max-h-[600px] w-[800px] overflow-hidden">
-                    <Card className="hero-card w-[800px] h-[600px] overflow-hidden">
-                      {/* Make this content scrollable */}
-                      <CardContent className="flex flex-col items-center justify-start h-full w-full overflow-y-auto p-3">
-                        {/* User Name */}
-                        <p className="text-3xl font-hero text-heroYellow mb-3 drop-shadow-md">
-                          {user.name}
-                        </p>
+                  {/* Superhero Card (Full Height & Scrollable) */}
+                  <div className="relative transition-all duration-300 transform hover:scale-95 hover:border-4 hover:border-heroYellow hover:shadow-heroGlow rounded-xl w-full md:w-[800px] overflow-hidden h-screen md:h-[600px]">
+                    <Card className="hero-card w-full h-full overflow-hidden">
+                      {/* Scrollable Content with Smooth Scrolling */}
+                      <CardContent className="flex flex-col items-center justify-start h-full w-full overflow-y-auto scroll-smooth p-0 md:p-3">
+                        {/* User Name & Buttons Section */}
+                        <div className="flex flex-col md:flex-row items-center w-full justify-between h-auto md:h-20 flex-shrink-0 mb-3">
+                          {/* Prevent name from wrapping */}
+                          <p className="text-3xl md:text-5xl font-hero text-heroYellow drop-shadow-md text-center md:text-left">
+                            {user.name}
+                          </p>
 
-                        {/* Top Section: Hero Image & Stats Side by Side */}
-                        <CardContent className="flex flex-row p-0 gap-5 w-full">
+                          {/* Download Buttons - Stays Above Image on Mobile */}
+                          <div className="flex justify-center md:justify-end flex-wrap gap-2 order-1 md:order-none">
+                            <DownloadButton user={user} type="pdf" />
+                            <DownloadButton user={user} type="icon" />
+                          </div>
+                        </div>
+
+                        {/* Hero Image & Stats Section (Stacked on Mobile) */}
+                        <CardContent className="flex flex-col md:flex-row p-0 gap-5 w-full h-auto md:h-[300px]">
                           {/* Left Side: Hero Image */}
-                          <div className="flex flex-col items-start justify-center w-full md:w-1/2">
+                          <div className="w-full md:w-5/12 h-auto md:h-full">
                             <Image
                               src={imgSrc}
                               alt={`Hero ${user.name}`}
                               width={300}
                               height={300}
-                              className="rounded-lg border-4 border-heroRed shadow-heroGlow"
+                              className="w-full h-auto md:h-full object-cover rounded-lg border-4 border-heroRed shadow-heroGlow"
                             />
                           </div>
 
                           {/* Right Side: Hero Stats */}
-                          <div className="flex flex-col justify-center w-full text-white space-y-4 text-lg rounded-lg border-4 border-heroRed shadow-heroGlow p-3">
+                          <div className="w-full md:w-7/12 h-auto md:h-full flex flex-col justify-center text-white space-y-4 text-lg rounded-lg border-4 border-heroRed shadow-heroGlow p-3 pt-6">
                             <p>
                               <strong className="text-heroYellow">Team:</strong>{" "}
                               {user.team || "Unknown"}
