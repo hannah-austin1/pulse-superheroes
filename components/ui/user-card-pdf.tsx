@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 "use client";
 
-import React from "react";
+import React, { JSX } from "react";
 import {
   Document,
   Page,
@@ -12,6 +12,49 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { User } from "@/types";
+
+import emojiRegex from "emoji-regex";
+
+// ✅ Function to Convert Emojis to Image URLs (Cloudflare CDN)
+const replaceEmojisWithImages = (text: string) => {
+  const regex = emojiRegex();
+  let lastIndex = 0;
+  const parts: (string | JSX.Element)[] = [];
+
+  for (const match of text.matchAll(regex)) {
+    const emoji = match[0];
+    const emojiIndex = match.index ?? 0;
+
+    // ✅ Add text before the emoji
+    if (lastIndex < emojiIndex) {
+      parts.push(text.substring(lastIndex, emojiIndex));
+    }
+
+    // ✅ Convert emoji to Cloudflare Twemoji URL (Uses correct Unicode conversion)
+    const emojiCodePoints = Array.from(emoji)
+      .map((char) => char.codePointAt(0)?.toString(16))
+      .join("-");
+
+    const emojiUrl = `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${emojiCodePoints}.png`;
+
+    parts.push(
+      <Image
+        key={emojiIndex}
+        src={emojiUrl}
+        style={{ width: 14, height: 14 }}
+      />
+    );
+
+    lastIndex = emojiIndex + emoji.length;
+  }
+
+  // ✅ Add remaining text after last emoji
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts;
+};
 
 // 📥 Register Fonts
 Font.register({
@@ -30,11 +73,6 @@ Font.register({
       fontWeight: "bold",
     },
   ],
-});
-
-Font.register({
-  family: "Noto Color Emoji",
-  src: "https://github.com/googlefonts/noto-emoji/blob/main/fonts/NotoColorEmoji-Regular.ttf?raw=true",
 });
 
 // 🎨 Tailwind-Inspired Styles with Superhero Theme
@@ -184,7 +222,7 @@ const UserCardPDF: React.FC<{ user: User }> = ({ user }) => {
                   ]}
                 >
                   <Text style={styles.name}>{comment.name}</Text>:{" "}
-                  {comment.content}
+                  {replaceEmojisWithImages(comment.content)}
                 </Text>
               ))
             ) : (
