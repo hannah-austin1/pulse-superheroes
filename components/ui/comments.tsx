@@ -66,10 +66,10 @@ export default function CommentsSection({ user }: CommentsSectionProps) {
   };
 
   return (
-    <div className="flex flex-col w-full h-[500px] border-4 border-heroRed bg-black text-white rounded-lg shadow-heroGlow p-4">
+    <div className="flex flex-col w-full h-full text-white">
       {/* Title */}
       <h3 className="text-xl font-bold text-heroYellow mb-2 text-center">
-        Chat
+        Messages
       </h3>
 
       {/* ✅ Chat Messages */}
@@ -114,7 +114,7 @@ export default function CommentsSection({ user }: CommentsSectionProps) {
             </motion.p>
           )}
         </AnimatePresence>
-        {/* <div ref={messagesEndRef} /> ✅ Keeps scroll at bottom */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* ✅ Chat Input Box */}

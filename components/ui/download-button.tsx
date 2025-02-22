@@ -64,7 +64,7 @@ export default function DownloadButton({ user, type }: DownloadButtonProps) {
     <button
       onClick={handleDownload}
       disabled={isLoading}
-      className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg shadow-lg transition text-sm ${
+      className={`flex items-center gap-2 px-6 py-3 font-bold rounded-full shadow-xl transition text-sm ${
         type === "pdf"
           ? "bg-heroRed text-white hover:bg-heroYellow"
           : "bg-heroYellow text-black hover:bg-heroRed"
