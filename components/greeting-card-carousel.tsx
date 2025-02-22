@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User } from "@/types";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
 import HeroGrid from "./ui/grid";
 import FlippableCard from "./ui/flip-card";
 
@@ -20,20 +20,9 @@ export default function GreetingCardCarousel({
   const [direction, setDirection] = useState(1);
   const [selectedHero, setSelectedHero] = useState<User | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); // Track hover state
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        selectedHero &&
-        !(event.target as HTMLElement).closest(".carousel-container")
-      ) {
-        setSelectedHero(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedHero]);
-
+  // Navigation Functions
   const nextSlide = useCallback(() => {
     setDirection(1);
     setIndex((prevIndex) => (prevIndex + 1) % users.length);
@@ -97,12 +86,41 @@ export default function GreetingCardCarousel({
                     <FlippableCard
                       user={users[index]}
                       isFlipped={isFlipped}
-                      setIsFlipped={() => setIsFlipped(!isFlipped)}
                       username={username}
                     />
                   </motion.div>
                 </AnimatePresence>
               </div>
+
+              {/* 🔄 **Flip Button with Tooltip** */}
+              <div
+                className="absolute top-4 right-4"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <button
+                  onClick={() => setIsFlipped(!isFlipped)}
+                  className="bg-heroYellow text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
+                >
+                  <RotateCw className="w-6 h-6" />
+                </button>
+
+                {/* Tooltip */}
+                <AnimatePresence>
+                  {isHovered && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-1 rounded-lg shadow-lg"
+                    >
+                      Flip to Messages
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* **Navigation Buttons** */}
               <button
                 onClick={prevSlide}

@@ -5,37 +5,29 @@ import CommentsSection from "./comments";
 import Image from "next/image";
 import DownloadButton from "./download-button";
 import { User } from "@/types";
-import { RotateCw } from "lucide-react";
 
 export default function FlippableCard({
   user,
   isFlipped,
-  setIsFlipped,
   username,
 }: {
   user: User;
   isFlipped: boolean;
-  setIsFlipped: () => void;
   username: string;
 }) {
   // Persist initial flip state across renders
-  const initialRender = useRef(true);
+  // Track previous user to prevent unnecessary flip resets
+  const previousUser = useRef(user.id);
   const [localFlip, setLocalFlip] = useState(isFlipped);
 
   useEffect(() => {
-    if (initialRender.current) {
-      // On first render, don't animate
-      initialRender.current = false;
-    } else {
-      // Sync state with global flip state only if manually changed
-      setLocalFlip(isFlipped);
+    if (previousUser.current !== user.id) {
+      previousUser.current = user.id; // Update previous user ID
+      return; // Do nothing, prevents resetting the flip on user change
     }
-  }, [isFlipped]);
 
-  const handlePress = () => {
-    setIsFlipped();
-    setLocalFlip(!localFlip);
-  };
+    setLocalFlip(isFlipped); // Only update localFlip when flipping is explicitly toggled
+  }, [isFlipped, user.id]);
 
   return (
     <Card
@@ -48,13 +40,6 @@ export default function FlippableCard({
           <h1 className="text-5xl font-bold font-hero uppercase text-yellow-400 text-center tracking-wide drop-shadow-[3px_3px_0px_black]">
             {user.name}
           </h1>
-          {/* 🔄 **Flip Button** */}
-          <button
-            onClick={handlePress}
-            className="absolute top-3 right-3 bg-heroYellow text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
-          >
-            <RotateCw className="w-6 h-6" />
-          </button>
         </div>
 
         {/* **Flipping Content** */}
@@ -64,7 +49,7 @@ export default function FlippableCard({
             rotateY: localFlip ? 180 : 0,
           }}
           transition={
-            initialRender.current
+            previousUser.current === user.id
               ? { duration: 0 }
               : { duration: 0.6, ease: "easeInOut" }
           } // Disable animation on mount
