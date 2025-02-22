@@ -85,7 +85,7 @@ export default function CommentsSection({
                     scale: 0.5,
                     transition: { duration: 0.3 },
                   }}
-                  className={`w-fit max-w-[90%] p-3 rounded-lg border-black shadow-[3px_3px_0px_black] text-white ${
+                  className={`w-fit max-w-[90%] p-2 mr-2 rounded-lg border-black shadow-[3px_3px_0px_black] text-white ${
                     isMe ? "bg-heroBlue self-end" : "bg-heroYellow self-start"
                   }`}
                 >
