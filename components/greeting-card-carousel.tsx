@@ -1,15 +1,14 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import Image from "next/image";
 import { User } from "@/types";
-import CommentForm from "@/components/ui/comment-form";
 import DownloadButton from "@/components/ui/download-button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import HeroGrid from "./ui/grid";
+import CommentsSection from "./ui/comments";
 
 interface GreetingCardCarouselProps {
   users: User[];
@@ -18,127 +17,190 @@ interface GreetingCardCarouselProps {
 export default function GreetingCardCarousel({
   users,
 }: GreetingCardCarouselProps) {
-  const url = process.env.NEXT_PUBLIC_IMAGE_ENDPOINT;
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [selectedHero, setSelectedHero] = useState<User | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null); // ✅ Track the card container
+
+  // ✅ Scroll to the top of the card when switching slides
+  useEffect(() => {
+    if (cardRef.current) {
+      cardRef.current.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [index]);
+
+  const nextSlide = () => {
+    setDirection(1);
+    setIndex((prevIndex) => (prevIndex + 1) % users.length);
+  };
+
+  const prevSlide = () => {
+    setDirection(-1);
+    setIndex((prevIndex) => (prevIndex - 1 + users.length) % users.length);
+  };
+
+  // ✅ Close carousel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectedHero &&
+        !(event.target as HTMLElement).closest(".carousel-container")
+      ) {
+        setSelectedHero(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [selectedHero]);
+
+  // ✅ Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (selectedHero) {
+        if (event.key === "ArrowLeft") prevSlide();
+        if (event.key === "ArrowRight") nextSlide();
+        if (event.key === "Escape") setSelectedHero(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedHero]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-6 flex flex-col items-center h-full">
-      {users.length === 0 ? (
-        <p className="text-center text-gray-400 text-xl">No heroes found.</p>
-      ) : (
-        <Carousel opts={{ loop: true }} className="w-full">
-          <CarouselContent className="flex w-full">
-            {users.map((user) => {
-              const imgSrc = `${url}/${user.name.split(" ")[0]}.png`;
+    <div className="w-full max-w-6xl mx-auto">
+      {!selectedHero && (
+        <HeroGrid
+          users={users}
+          onSelectHero={(user) => {
+            setSelectedHero(user);
+            setIndex(users.findIndex((u) => u.id === user.id));
+          }}
+        />
+      )}
 
-              return (
-                <CarouselItem
-                  key={user.id}
-                  className="w-full flex justify-center items-center"
+      <AnimatePresence>
+        {selectedHero && (
+          <motion.div
+            className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 h-screen overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              layoutId={`hero-${selectedHero.id}`}
+              className="carousel-container relative w-full max-w-5xl h-full max-h-screen bg-black rounded-lg p-6 shadow-lg flex flex-col overflow-y-auto"
+            >
+              {/* 🚀 Animated Carousel Container */}
+              <div className="relative w-full h-full flex flex-col justify-center items-center">
+                <AnimatePresence
+                  mode="popLayout"
+                  initial={false}
+                  custom={direction}
                 >
-                  {/* Superhero Card (Scrollable) */}
-                  {/* Superhero Card (Full Height & Scrollable) */}
-                  <div className="relative transition-all duration-300 transform hover:scale-95 hover:border-4 hover:border-heroYellow hover:shadow-heroGlow rounded-xl w-full md:w-[800px] overflow-hidden h-screen md:h-[600px]">
-                    <Card className="hero-card w-full h-full overflow-hidden">
-                      {/* Scrollable Content with Smooth Scrolling */}
-                      <CardContent className="flex flex-col items-center justify-start h-full w-full overflow-y-auto scroll-smooth p-0 md:p-3">
-                        {/* User Name & Buttons Section */}
-                        <div className="flex flex-col md:flex-row items-center w-full justify-between h-auto md:h-20 flex-shrink-0 mb-3">
-                          {/* Prevent name from wrapping */}
-                          <p className="text-3xl md:text-5xl font-hero text-heroYellow drop-shadow-md text-center md:text-left">
-                            {user.name}
+                  <motion.div
+                    key={users[index].id}
+                    custom={direction}
+                    initial={{ opacity: 0, x: direction * 50 }}
+                    animate={{
+                      opacity: 1,
+                      x: 0,
+                      transition: {
+                        delay: 0.2,
+                        type: "spring",
+                        visualDuration: 0.3,
+                        bounce: 0.4,
+                      },
+                    }}
+                    exit={{ opacity: 0, x: direction * -50 }}
+                    className="absolute w-full flex justify-center items-center"
+                  >
+                    {/* Card Component */}
+                    <Card
+                      ref={cardRef} // ✅ Assign ref to track scrolling
+                      className="hero-card w-full h-full max-h-screen overflow-y-auto shadow-xl flex flex-col"
+                    >
+                      <CardContent className="flex flex-col items-center justify-start h-full w-full overflow-y-auto p-3">
+                        {/* Name + Buttons */}
+                        <div className="flex flex-row items-center w-full justify-between h-20 flex-shrink-0 mb-3">
+                          <p className="text-5xl font-hero text-heroYellow drop-shadow-md whitespace-nowrap">
+                            {users[index].name}
                           </p>
-
-                          {/* Download Buttons - Stays Above Image on Mobile */}
-                          <div className="flex justify-center md:justify-end flex-wrap gap-2 order-1 md:order-none">
-                            <DownloadButton user={user} type="pdf" />
-                            <DownloadButton user={user} type="icon" />
+                          <div className="flex justify-end flex-wrap gap-2">
+                            <DownloadButton user={users[index]} type="pdf" />
+                            <DownloadButton user={users[index]} type="icon" />
                           </div>
                         </div>
 
-                        {/* Hero Image & Stats Section (Stacked on Mobile) */}
-                        <CardContent className="flex flex-col md:flex-row p-0 gap-5 w-full h-auto md:h-[300px]">
-                          {/* Left Side: Hero Image */}
-                          <div className="w-full md:w-5/12 h-auto md:h-full">
+                        {/* Hero Image & Stats Section */}
+                        <CardContent className="flex flex-col md:flex-row p-0 gap-5 w-full h-auto">
+                          {/* Hero Image */}
+                          <div className="w-full md:w-5/12 h-[300px]">
                             <Image
-                              src={imgSrc}
-                              alt={`Hero ${user.name}`}
+                              src={`${process.env.NEXT_PUBLIC_IMAGE_ENDPOINT}/${
+                                users[index].name.split(" ")[0]
+                              }.png`}
+                              alt={`Hero ${users[index].name}`}
                               width={300}
                               height={300}
-                              className="w-full h-auto md:h-full object-cover rounded-lg border-4 border-heroRed shadow-heroGlow"
+                              className="w-full h-full object-cover rounded-lg border-4 border-heroRed shadow-heroGlow"
                             />
                           </div>
 
-                          {/* Right Side: Hero Stats */}
-                          <div className="w-full md:w-7/12 h-auto md:h-full flex flex-col justify-center text-white space-y-4 text-lg rounded-lg border-4 border-heroRed shadow-heroGlow p-3 pt-6">
+                          {/* Stats Section */}
+                          <div className="w-full md:w-7/12 h-auto flex flex-col justify-center text-white space-y-4 text-lg rounded-lg border-4 border-heroRed shadow-heroGlow p-3 pt-6">
                             <p>
                               <strong className="text-heroYellow">Team:</strong>{" "}
-                              {user.team || "Unknown"}
+                              {users[index].team || "Unknown"}
                             </p>
                             <p>
                               <strong className="text-heroYellow">
                                 Time on Project:
                               </strong>{" "}
-                              {user.time_on_project || "N/A"}
+                              {users[index].time_on_project || "N/A"}
                             </p>
                             <p>
                               <strong className="text-heroYellow">
                                 Tickets Worked on:
                               </strong>{" "}
-                              {user.tickets_completed || "N/A"}
+                              {users[index].tickets_completed || "N/A"}
                             </p>
                             <p>
                               <strong className="text-heroYellow">
                                 Favorite Moment:
                               </strong>{" "}
-                              {user.favourite_moment || "None yet"}
+                              {users[index].favourite_moment || "None yet"}
                             </p>
                           </div>
                         </CardContent>
 
                         {/* Comments Section */}
-                        <div className="w-full text-center flex flex-col flex-grow">
-                          {/* Add comment form inside the carousel */}
-                          <div className="mt-4 w-full mb-4">
-                            <CommentForm userId={user.id} />
-                          </div>
-
-                          <h3 className="text-xl font-bold text-heroYellow mb-2">
-                            Comments
-                          </h3>
-
-                          <div className="mt-4 mb-4 space-y-3 text-sm p-4 border-4 border-heroRed bg-black text-white rounded-lg shadow-heroGlow">
-                            {user.comments && user.comments.length > 0 ? (
-                              user.comments.map((comment) => (
-                                <div
-                                  key={comment.id}
-                                  className="p-4 bg-heroDark text-white rounded-lg border-2 border-heroYellow shadow-heroInset"
-                                >
-                                  <strong className="text-heroYellow">
-                                    {comment.name}:
-                                  </strong>{" "}
-                                  {comment.content}
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-gray-400 text-center font-bold">
-                                No heroic messages yet. Be the first!
-                              </p>
-                            )}
-                          </div>
+                        <div className="w-full text-center flex flex-col flex-grow mt-4">
+                          <CommentsSection user={users[index]} />
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-          {/* Navigation Buttons */}
-          <CarouselPrevious className="hero-btn" />
-          <CarouselNext className="hero-btn" />
-        </Carousel>
-      )}
+              {/* 🚀 Navigation Arrows */}
+              <button
+                onClick={prevSlide}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
+              >
+                <ArrowRight className="w-6 h-6" />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

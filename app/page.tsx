@@ -10,13 +10,21 @@ async function fetchUsers(): Promise<User[]> {
     .select(
       "id, name, team, tickets_completed, time_on_project, favourite_moment, comments(id, content, created_at, name)"
     )
-    .order("created_at", { foreignTable: "comments", ascending: false });
-
+    .order("id", { ascending: true }); // Keep users sorted normally
   if (error) {
     console.error("Error fetching users:", error);
     return [];
   }
-  return data as User[];
+
+  return data.map((user) => ({
+    ...user,
+    comments: user.comments
+      ? user.comments.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        ) // ✅ Sort comments by created_at manually
+      : [],
+  })) as User[];
 }
 
 export default async function Home() {
