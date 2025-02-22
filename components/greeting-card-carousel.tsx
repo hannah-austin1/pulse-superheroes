@@ -2,13 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
 import { User } from "@/types";
-import DownloadButton from "@/components/ui/download-button";
 import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
 import HeroGrid from "./ui/grid";
-import CommentsSection from "./ui/comments";
+import FlippableCard from "./ui/flip-card";
 
 interface GreetingCardCarouselProps {
   users: User[];
@@ -98,102 +95,12 @@ export default function GreetingCardCarousel({
                     exit={{ opacity: 0, x: direction * -50 }}
                     transition={{ type: "spring", bounce: 0.4 }}
                   >
-                    {/* 🚀 **Flip Card Wrapper** */}
-                    <motion.div
-                      className="relative w-full h-full"
-                      animate={{ rotateY: isFlipped ? 180 : 0 }}
-                      transition={{ duration: 0.6, ease: "easeInOut" }}
-                      style={{ transformStyle: "preserve-3d" }}
-                    >
-                      {/* **Front Side (Hero Info)** */}
-                      <motion.div
-                        className={`absolute w-full h-full flex flex-col justify-center items-center`}
-                        style={{ backfaceVisibility: "hidden" }}
-                      >
-                        <Card
-                          className="hero-card relative w-full h-full shadow-xl flex flex-col
-    before:absolute before:inset-0 before:bg-[radial-gradient(circle,yellow_20%,orange_40%,red_60%)] before:opacity-50 before:pointer-events-none
-    after:absolute after:inset-0 after:bg-[radial-gradient(circle,rgba(255,255,255,0.2)_2px,black_3px)] after:bg-[size:12px_12px] after:opacity-30 after:pointer-events-none"
-                        >
-                          <CardContent className="flex flex-col items-center justify-start h-full w-full z-40 overflow-scroll">
-                            {/* Name & Buttons */}
-                            <div className="flex flex-col w-full items-center mb-4">
-                              <p className="text-6xl font-bold font-hero uppercase text-yellow-400 text-center tracking-wide drop-shadow-[3px_3px_0px_black]">
-                                {users[index].name}
-                              </p>
-                            </div>
-
-                            {/* Hero Image & Stats Section */}
-                            <CardContent
-                              className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white relative
-    before:absolute before:inset-0 before:bg-[radial-gradient(circle,rgba(255,0,0,0.2)_2px,transparent_2px)] before:bg-[size:12px_12px] before:opacity-50 before:pointer-events-none overflow-scroll"
-                            >
-                              <div className="flex justify-center flex-wrap gap-2 mt-3">
-                                <DownloadButton
-                                  user={users[index]}
-                                  type="pdf"
-                                />
-                                <DownloadButton
-                                  user={users[index]}
-                                  type="icon"
-                                />
-                              </div>
-                              <div className="w-full flex justify-center">
-                                <Image
-                                  src={`${
-                                    process.env.NEXT_PUBLIC_IMAGE_ENDPOINT
-                                  }/${users[index].name.split(" ")[0]}.png`}
-                                  alt={`Hero ${users[index].name}`}
-                                  width={250}
-                                  height={250}
-                                  className="rounded-lg border-[6px] border-heroRed shadow-[4px_4px_0px_black] bg-yellow-400 p-2"
-                                />
-                              </div>
-
-                              <div className="w-full h-auto flex flex-col text-white justify-center space-y-4 text-lg p-6 font-bold uppercase">
-                                <p className="bg-heroYellow px-3 py-1 rounded-xl text-center shadow-[3px_3px_0px_black]">
-                                  Team: {users[index].team || "Unknown"}
-                                </p>
-                                <p className="bg-heroBlue px-3 py-1 rounded-xl text-center shadow-[3px_3px_0px_black]">
-                                  Time on Project:{" "}
-                                  {users[index].time_on_project || "N/A"}
-                                </p>
-                                <p className="bg-heroRed px-3 py-1 rounded-xl text-center shadow-[3px_3px_0px_black]">
-                                  Tickets Worked on:{" "}
-                                  {users[index].tickets_completed || "N/A"}
-                                </p>
-                                <p className="bg-heroDark text-white px-3 py-1 rounded-xl text-center shadow-[3px_3px_0px_black]">
-                                  Favourite Moment:{" "}
-                                  {users[index].favourite_moment || "None yet"}
-                                </p>
-                              </div>
-                            </CardContent>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-
-                      {/* **Back Side (Chat) - Fixed Mirror Effect** */}
-                      <motion.div
-                        className={`absolute w-full h-full flex flex-col justify-center items-center`}
-                        style={{
-                          transform: "rotateY(180deg)",
-                          backfaceVisibility: "hidden",
-                        }}
-                      >
-                        <Card
-                          className="hero-card relative w-full h-full shadow-xl flex flex-col
-    before:absolute before:inset-0 before:bg-[radial-gradient(circle,yellow_20%,orange_40%,red_60%)] before:opacity-50 before:pointer-events-none
-    after:absolute after:inset-0 after:bg-[radial-gradient(circle,rgba(255,255,255,0.2)_2px,black_3px)] after:bg-[size:12px_12px] after:opacity-30 after:pointer-events-none"
-                        >
-                          <CardContent className="flex flex-col items-center justify-start h-full w-full z-40">
-                            <CommentsSection
-                              user={users[index]}
-                              username={username}
-                            />
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    </motion.div>
+                    {/* Flippable Card Component */}
+                    <FlippableCard
+                      user={users[index]}
+                      isFlipped={isFlipped}
+                      username={username}
+                    />
                   </motion.div>
                 </AnimatePresence>
               </div>
