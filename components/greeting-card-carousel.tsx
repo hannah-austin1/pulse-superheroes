@@ -12,10 +12,12 @@ import CommentsSection from "./ui/comments";
 
 interface GreetingCardCarouselProps {
   users: User[];
+  username: string;
 }
 
 export default function GreetingCardCarousel({
   users,
+  username,
 }: GreetingCardCarouselProps) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -61,30 +63,28 @@ export default function GreetingCardCarousel({
 
   return (
     <div className="w-full max-w-6xl mx-auto">
-      {!selectedHero && (
-        <HeroGrid
-          users={users}
-          onSelectHero={(user) => {
-            setSelectedHero(user);
-            setIndex(users.findIndex((u) => u.id === user.id));
-          }}
-        />
-      )}
+      <HeroGrid
+        users={users}
+        onSelectHero={(user) => {
+          setSelectedHero(user);
+          setIndex(users.findIndex((u) => u.id === user.id));
+        }}
+      />
 
       <AnimatePresence>
         {selectedHero && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 h-screen overflow-hidden"
+            className="fixed inset-0 flex justify-center bg-black bg-opacity-70 items-center h-screen overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
               layoutId={`hero-${selectedHero.id}`}
-              className="carousel-container relative w-full max-w-6xl h-full max-h-screen rounded-lg p-6 shadow-lg flex flex-col"
+              className="carousel-container relative w-full max-w-3xl h-full max-h-screen rounded-lg p-3 shadow-lg flex flex-col"
             >
               {/* 🚀 **Carousel Wrapper** */}
-              <div className="relative w-full h-full flex justify-center items-center">
+              <div className="relative h-full flex justify-center items-center">
                 <AnimatePresence
                   mode="popLayout"
                   initial={false}
@@ -125,8 +125,8 @@ export default function GreetingCardCarousel({
 
                             {/* Hero Image & Stats Section */}
                             <CardContent
-                              className="flex flex-col p-3 gap-5 w-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white relative
-    before:absolute before:inset-0 before:bg-[radial-gradient(circle,rgba(255,0,0,0.2)_2px,transparent_2px)] before:bg-[size:12px_12px] before:opacity-50 before:pointer-events-none"
+                              className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white relative
+    before:absolute before:inset-0 before:bg-[radial-gradient(circle,rgba(255,0,0,0.2)_2px,transparent_2px)] before:bg-[size:12px_12px] before:opacity-50 before:pointer-events-none overflow-scroll"
                             >
                               <div className="flex justify-center flex-wrap gap-2 mt-3">
                                 <DownloadButton
@@ -174,14 +174,23 @@ export default function GreetingCardCarousel({
 
                       {/* **Back Side (Chat) - Fixed Mirror Effect** */}
                       <motion.div
-                        className="absolute w-full h-full flex justify-center items-center bg-black"
+                        className={`absolute w-full h-full flex flex-col justify-center items-center`}
                         style={{
                           transform: "rotateY(180deg)",
                           backfaceVisibility: "hidden",
                         }}
                       >
-                        <Card className="hero-card w-full h-full overflow-hidden shadow-xl flex flex-col">
-                          <CommentsSection user={users[index]} />
+                        <Card
+                          className="hero-card relative w-full h-full shadow-xl flex flex-col
+    before:absolute before:inset-0 before:bg-[radial-gradient(circle,yellow_20%,orange_40%,red_60%)] before:opacity-50 before:pointer-events-none
+    after:absolute after:inset-0 after:bg-[radial-gradient(circle,rgba(255,255,255,0.2)_2px,black_3px)] after:bg-[size:12px_12px] after:opacity-30 after:pointer-events-none"
+                        >
+                          <CardContent className="flex flex-col items-center justify-start h-full w-full z-40">
+                            <CommentsSection
+                              user={users[index]}
+                              username={username}
+                            />
+                          </CardContent>
                         </Card>
                       </motion.div>
                     </motion.div>

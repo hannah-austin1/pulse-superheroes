@@ -3,7 +3,7 @@ import Logo from "@/public/menu-logo.png";
 
 export default function HeroHeader() {
   return (
-    <header className="bg-heroRed flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 py-4 md:py-6 border-heroYellow border-b-4 px-4">
+    <header className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 py-4 md:py-6 px-4">
       {/* BP Pulse Logo */}
       <Image
         src={Logo}

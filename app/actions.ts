@@ -2,6 +2,14 @@
 
 import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+
+export async function setUsername(name: string) {
+  const cookieStore = await cookies();
+
+  cookieStore.set("username", name);
+  revalidatePath("/");
+}
 
 export async function addComment(
   userId: string,

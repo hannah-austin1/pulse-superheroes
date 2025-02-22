@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import GreetingCardCarousel from "@/components/greeting-card-carousel";
 import { User } from "@/types";
-import HeroHeader from "@/components/ui/header";
+import { cookies } from "next/headers";
+import Splash from "@/components/ui/splash";
 
 // Fetch users on the server side
 async function fetchUsers(): Promise<User[]> {
@@ -29,12 +30,16 @@ async function fetchUsers(): Promise<User[]> {
 
 export default async function Home() {
   const users = await fetchUsers();
+  const cookieStore = await cookies();
+  const storedName = cookieStore.get("username")?.value;
 
   return (
-    <div className="h-screen">
-      <HeroHeader />
+    <div className="h-screen overflow-hidden">
+      {!storedName && <Splash />}
       <main>
-        <GreetingCardCarousel users={users} />
+        {storedName && (
+          <GreetingCardCarousel users={users} username={storedName} />
+        )}
       </main>
     </div>
   );
