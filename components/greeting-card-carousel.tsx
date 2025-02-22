@@ -113,9 +113,9 @@ export default function GreetingCardCarousel({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-3 py-1 rounded-lg shadow-lg"
+                      className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-heroDark text-white text-lg px-3 py-1 rounded-lg shadow-lg"
                     >
-                      Flip to Messages
+                      {!isFlipped ? `Flip to Messages` : `Flip to Info`}
                     </motion.div>
                   )}
                 </AnimatePresence>
