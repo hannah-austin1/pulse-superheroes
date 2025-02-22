@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User } from "@/types";
 import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
@@ -21,6 +21,17 @@ export default function GreetingCardCarousel({
   const [selectedHero, setSelectedHero] = useState<User | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isHovered, setIsHovered] = useState(false); // Track hover state
+
+  // Track previous user ID to prevent unwanted resets
+  const previousUser = useRef(users[index]?.id);
+
+  useEffect(() => {
+    if (previousUser.current !== users[index]?.id) {
+      previousUser.current = users[index]?.id;
+      // Do NOT reset `isFlipped`, so the side stays consistent across users
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
 
   // Navigation Functions
   const nextSlide = useCallback(() => {
@@ -46,7 +57,7 @@ export default function GreetingCardCarousel({
   }, [nextSlide, prevSlide, selectedHero]);
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto">
       <HeroGrid
         users={users}
         onSelectHero={(user) => {
@@ -65,7 +76,7 @@ export default function GreetingCardCarousel({
           >
             <motion.div
               layoutId={`hero-${selectedHero.id}`}
-              className="carousel-container relative w-full max-w-3xl h-full max-h-screen rounded-lg p-3 shadow-lg flex flex-col"
+              className="carousel-container relative w-3/4 h-full max-w-3xl max-h-screen rounded-lg p-3 shadow-lg flex flex-col"
             >
               {/* 🚀 **Carousel Wrapper** */}
               <div className="relative h-full flex justify-center items-center">
@@ -76,7 +87,7 @@ export default function GreetingCardCarousel({
                 >
                   <motion.div
                     key={users[index].id}
-                    className="absolute w-full h-full max-w-xl flex flex-col justify-center items-center bg-heroBlack"
+                    className="absolute w-full h-full  flex flex-col justify-center items-center bg-heroBlack"
                     initial={{ opacity: 0, x: direction * 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: direction * -50 }}
@@ -87,6 +98,7 @@ export default function GreetingCardCarousel({
                       user={users[index]}
                       isFlipped={isFlipped}
                       username={username}
+                      shouldAnimate={previousUser.current === users[index].id}
                     />
                   </motion.div>
                 </AnimatePresence>
