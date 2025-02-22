@@ -44,6 +44,20 @@ export default function GreetingCardCarousel({
     setIndex((prevIndex) => (prevIndex - 1 + users.length) % users.length);
   }, [users.length]);
 
+  // ✅ Close carousel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        selectedHero &&
+        !(event.target as HTMLElement).closest(".carousel-container")
+      ) {
+        setSelectedHero(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [selectedHero]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (selectedHero) {
@@ -76,10 +90,10 @@ export default function GreetingCardCarousel({
           >
             <motion.div
               layoutId={`hero-${selectedHero.id}`}
-              className="carousel-container relative w-3/4 h-full max-w-3xl max-h-screen rounded-lg p-3 shadow-lg flex flex-col"
+              className="carousel-container relative w-full max-w-3xl h-full justify-center items-center max-h-screen rounded-lg p-6 shadow-lg flex flex-col"
             >
               {/* 🚀 **Carousel Wrapper** */}
-              <div className="relative h-full flex justify-center items-center">
+              <div className="relative h-full w-full flex justify-center items-center">
                 <AnimatePresence
                   mode="popLayout"
                   initial={false}
@@ -106,7 +120,7 @@ export default function GreetingCardCarousel({
 
               {/* 🔄 **Flip Button with Tooltip** */}
               <div
-                className="absolute top-4 right-4"
+                className="absolute top-8 right-10"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
@@ -114,7 +128,7 @@ export default function GreetingCardCarousel({
                   onClick={() => setIsFlipped(!isFlipped)}
                   className="bg-heroYellow text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
                 >
-                  <RotateCw className="w-6 h-6" />
+                  <RotateCw className="w-10 h-10" />
                 </button>
 
                 {/* Tooltip */}
@@ -136,15 +150,15 @@ export default function GreetingCardCarousel({
               {/* **Navigation Buttons** */}
               <button
                 onClick={prevSlide}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
               >
-                <ArrowLeft className="w-6 h-6" />
+                <ArrowLeft className="w-8 h-8" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-heroRed text-white p-3 rounded-full shadow-lg hover:bg-heroYellow transition"
               >
-                <ArrowRight className="w-6 h-6" />
+                <ArrowRight className="w-8 h-8" />
               </button>
             </motion.div>
           </motion.div>

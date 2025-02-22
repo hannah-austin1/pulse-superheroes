@@ -18,7 +18,11 @@ export default function FlippableCard({
 }) {
   console.log({ shouldAnimate });
   return (
-    <Card className="hero-card relative w-full h-full shadow-xl flex flex-col">
+    <Card
+      className="hero-card relative w-full h-full shadow-xl flex flex-col
+    before:absolute before:inset-0 before:bg-[radial-gradient(circle,yellow_20%,orange_40%,red_60%)] before:opacity-50 before:pointer-events-none
+    after:absolute after:inset-0 after:bg-[radial-gradient(circle,rgba(255,255,255,0.2)_2px,black_3px)] after:bg-[size:12px_12px] after:opacity-30 after:pointer-events-none"
+    >
       <CardContent className="flex flex-col items-center justify-start h-full w-full z-40 overflow-scroll">
         <div className="flex flex-col w-full items-center mb-4">
           <h1 className="text-5xl font-bold font-hero uppercase text-yellow-400 text-center tracking-wide drop-shadow-[3px_3px_0px_black]">
