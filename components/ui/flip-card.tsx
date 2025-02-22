@@ -1,19 +1,42 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent } from "./card";
 import CommentsSection from "./comments";
 import Image from "next/image";
 import DownloadButton from "./download-button";
 import { User } from "@/types";
+import { RotateCw } from "lucide-react";
 
 export default function FlippableCard({
   user,
   isFlipped,
+  setIsFlipped,
   username,
 }: {
   user: User;
   isFlipped: boolean;
+  setIsFlipped: () => void;
   username: string;
 }) {
+  // Persist initial flip state across renders
+  const initialRender = useRef(true);
+  const [localFlip, setLocalFlip] = useState(isFlipped);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      // On first render, don't animate
+      initialRender.current = false;
+    } else {
+      // Sync state with global flip state only if manually changed
+      setLocalFlip(isFlipped);
+    }
+  }, [isFlipped]);
+
+  const handlePress = () => {
+    setIsFlipped();
+    setLocalFlip(!localFlip);
+  };
+
   return (
     <Card
       className="hero-card relative w-full h-full shadow-xl flex flex-col
@@ -22,16 +45,29 @@ export default function FlippableCard({
     >
       <CardContent className="flex flex-col items-center justify-start h-full w-full z-40 overflow-scroll">
         <div className="flex flex-col w-full items-center mb-4">
-          <p className="text-6xl font-bold font-hero uppercase text-yellow-400 text-center tracking-wide drop-shadow-[3px_3px_0px_black]">
+          <h1 className="text-5xl font-bold font-hero uppercase text-yellow-400 text-center tracking-wide drop-shadow-[3px_3px_0px_black]">
             {user.name}
-          </p>
+          </h1>
+          {/* 🔄 **Flip Button** */}
+          <button
+            onClick={handlePress}
+            className="absolute top-3 right-3 bg-heroYellow text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
+          >
+            <RotateCw className="w-6 h-6" />
+          </button>
         </div>
 
         {/* **Flipping Content** */}
         <motion.div
           className="relative w-full h-full"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
+          animate={{
+            rotateY: localFlip ? 180 : 0,
+          }}
+          transition={
+            initialRender.current
+              ? { duration: 0 }
+              : { duration: 0.6, ease: "easeInOut" }
+          } // Disable animation on mount
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* **Front Side (Hero Info)** */}
@@ -39,10 +75,7 @@ export default function FlippableCard({
             className="absolute w-full h-full"
             style={{ backfaceVisibility: "hidden" }}
           >
-            <CardContent
-              className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white relative
-                before:absolute before:inset-0 before:bg-[radial-gradient(circle,rgba(255,0,0,0.2)_2px,transparent_2px)] before:bg-[size:12px_12px] before:opacity-50 before:pointer-events-none overflow-scroll"
-            >
+            <CardContent className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white overflow-scroll">
               <div className="flex justify-center flex-wrap gap-2 mt-3">
                 <DownloadButton user={user} type="pdf" />
                 <DownloadButton user={user} type="icon" />
@@ -84,10 +117,7 @@ export default function FlippableCard({
               backfaceVisibility: "hidden",
             }}
           >
-            <CardContent
-              className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white relative
-                before:absolute before:inset-0 before:bg-[radial-gradient(circle,rgba(255,0,0,0.2)_2px,transparent_2px)] before:bg-[size:12px_12px] before:opacity-50 before:pointer-events-none overflow-hidden"
-            >
+            <CardContent className="flex flex-col p-3 gap-5 w-full h-full items-center rounded-lg border-4 border-black shadow-[6px_6px_0px_black] bg-white overflow-hidden">
               <CommentsSection user={user} username={username} />
             </CardContent>
           </motion.div>

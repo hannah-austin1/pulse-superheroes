@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User } from "@/types";
-import { ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import HeroGrid from "./ui/grid";
 import FlippableCard from "./ui/flip-card";
 
@@ -34,6 +34,16 @@ export default function GreetingCardCarousel({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [selectedHero]);
 
+  const nextSlide = useCallback(() => {
+    setDirection(1);
+    setIndex((prevIndex) => (prevIndex + 1) % users.length);
+  }, [users.length]);
+
+  const prevSlide = useCallback(() => {
+    setDirection(-1);
+    setIndex((prevIndex) => (prevIndex - 1 + users.length) % users.length);
+  }, [users.length]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (selectedHero) {
@@ -44,19 +54,7 @@ export default function GreetingCardCarousel({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedHero]);
-
-  const nextSlide = () => {
-    setDirection(1);
-    setIndex((prevIndex) => (prevIndex + 1) % users.length);
-    setIsFlipped(false);
-  };
-
-  const prevSlide = () => {
-    setDirection(-1);
-    setIndex((prevIndex) => (prevIndex - 1 + users.length) % users.length);
-    setIsFlipped(false);
-  };
+  }, [nextSlide, prevSlide, selectedHero]);
 
   return (
     <div className="w-full max-w-6xl mx-auto">
@@ -99,20 +97,12 @@ export default function GreetingCardCarousel({
                     <FlippableCard
                       user={users[index]}
                       isFlipped={isFlipped}
+                      setIsFlipped={() => setIsFlipped(!isFlipped)}
                       username={username}
                     />
                   </motion.div>
                 </AnimatePresence>
               </div>
-
-              {/* 🔄 **Flip Button** */}
-              <button
-                onClick={() => setIsFlipped(!isFlipped)}
-                className="absolute top-3 right-3 bg-heroYellow text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
-              >
-                <RotateCw className="w-6 h-6" />
-              </button>
-
               {/* **Navigation Buttons** */}
               <button
                 onClick={prevSlide}
