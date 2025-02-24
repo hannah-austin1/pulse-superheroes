@@ -71,7 +71,7 @@ export default function GreetingCardCarousel({
   }, [nextSlide, prevSlide, selectedHero]);
 
   return (
-    <div className="w-full mx-auto bg-heroRed">
+    <div className="w-full mx-auto bg-page bg-cover bg-right-bottom">
       <HeroGrid
         users={users}
         onSelectHero={(user) => {

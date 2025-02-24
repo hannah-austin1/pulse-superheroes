@@ -69,6 +69,9 @@ export default {
         heroGlow: "0px 4px 20px rgba(230, 57, 70, 0.6)", // Red glow
         heroInset: "inset 0px 2px 8px rgba(255, 255, 255, 0.3)", // Metallic inset
       },
+      backgroundImage: {
+        page: "url('/bg.png')",
+      },
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-require-imports
