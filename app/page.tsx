@@ -34,7 +34,7 @@ export default async function Home() {
   const storedName = cookieStore.get("username")?.value;
 
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="h-screen overflow-scroll">
       {!storedName && <Splash />}
       <main>
         {storedName && (
